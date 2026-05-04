@@ -10,7 +10,7 @@ const contactForm = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
 
 // ===== Typing Animation =====
-const roles = ['Python Developer', 'Django Expert', 'Backend Engineer', 'API Architect'];
+const roles = ['Python Developer', 'Django Expert', 'Backend Engineer', 'REST API Developer', 'Problem Solver'];
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -279,6 +279,71 @@ function init3DCards() {
   });
 }
 
+// ===== Hero Stat Counter Animation =====
+function initHeroStatCounters() {
+  const statNumbers = document.querySelectorAll('.hero-stat-number[data-count]');
+  if (!statNumbers.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count'));
+        let current = 0;
+        const duration = 1500;
+        const increment = target / (duration / 30);
+
+        const counter = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(counter);
+          }
+          el.textContent = Math.round(current) + '+';
+        }, 30);
+
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  statNumbers.forEach(el => observer.observe(el));
+}
+
+// ===== Parallax Orbs on Mouse =====
+function initParallaxOrbs() {
+  if (window.innerWidth < 768) return;
+
+  const orbs = document.querySelectorAll('.hero-orb');
+  if (!orbs.length) return;
+
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const mouseX = e.clientX - rect.left - centerX;
+    const mouseY = e.clientY - rect.top - centerY;
+
+    orbs.forEach((orb, i) => {
+      const speed = (i + 1) * 0.015;
+      const x = mouseX * speed;
+      const y = mouseY * speed;
+      orb.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    orbs.forEach(orb => {
+      orb.style.transition = 'transform 0.5s ease';
+      orb.style.transform = 'translate(0, 0)';
+      setTimeout(() => { orb.style.transition = ''; }, 500);
+    });
+  });
+}
+
 // ===== Initialize Everything =====
 document.addEventListener('DOMContentLoaded', () => {
   // Start typing animation
@@ -309,8 +374,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize 3D card effects
   init3DCards();
+
+  // Initialize hero stat counters
+  initHeroStatCounters();
+
+  // Initialize parallax orbs
+  initParallaxOrbs();
   
   // Initial scroll check
   handleScroll();
 });
-
